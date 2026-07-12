@@ -21,3 +21,16 @@ A Zillow-style real estate platform backed by real MLS property data.
 - Docker Desktop installed 
 - MySQL 8 container running with `rets` database
 - `rets_property` and `rets_openhouse` tables imported and verified
+
+### Week 2
+
+- Backend foundation
+- Working health check endpoint
+
+### Week 3
+
+- Property search endpoint
+- Indexes exist and are being used
+- Filter combinations work
+
+
