@@ -16,21 +16,25 @@ A Zillow-style real estate platform backed by real MLS property data.
 - Testing: Jest + React Testing Library + Supertest 
 
 ## Current Progress
-### Week 1
+### Week 1: Environment Setup & Database Import 
 
 - Docker Desktop installed 
 - MySQL 8 container running with `rets` database
 - `rets_property` and `rets_openhouse` tables imported and verified
 
-### Week 2
+### Week 2: Backend Foundation + REST API Basics
 
 - Backend foundation
 - Working health check endpoint
 
-### Week 3
+### Week 3: Property Search Endpoint with Filters & Indexing
 
 - Property search endpoint
 - Indexes exist and are being used
 - Filter combinations work
+
+### Week 4: Property Detail & Open House Endpoints
+- property by ID 
+- openhouses by property ID
 
 
