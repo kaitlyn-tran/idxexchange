@@ -34,7 +34,10 @@ A Zillow-style real estate platform backed by real MLS property data.
 - Filter combinations work
 
 ### Week 4: Property Detail & Open House Endpoints
-- property by ID 
-- openhouses by property ID
+- Property by ID 
+- Openhouses by property ID
 
+### Week 5: React Setup & Listings Page
+- Create React App
+- Property grid shows cards with real data fetched from backend
 

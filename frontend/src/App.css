@@ -1,0 +1,112 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+}
+
+.listings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.listings-header {
+  margin-bottom: 24px;
+}
+
+.listings-header h1 {
+  font-size: 1.8rem;
+  color: #111;
+}
+
+.listings-count {
+  font-size: 0.95rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* property grid layout */
+.property-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* card style */
+.property-card {
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.property-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-image-wrapper {
+  width: 100%;
+  height: 200px;
+  background-color: #e2e8f0;
+}
+
+.card-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-content {
+  padding: 16px;
+}
+
+.card-price {
+  font-size: 1.4rem;
+  color: #2b6cb0;
+  margin-bottom: 8px;
+}
+
+.card-specs {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-bottom: 12px;
+}
+
+.card-address {
+  font-size: 0.85rem;
+  color: #718096;
+  line-height: 1.4;
+}
+
+/* states */
+.state-message {
+  text-align: center;
+  padding: 48px;
+  font-size: 1.1rem;
+}
+
+.error-box {
+  background-color: #fff5f5;
+  border: 1px solid #feb2b2;
+  color: #c53030;
+  border-radius: 8px;
+}
+
+.error-box button {
+  margin-top: 12px;
+  padding: 8px 16px;
+  background-color: #c53030;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
