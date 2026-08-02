@@ -1,4 +1,3 @@
-
 async function handleResponse(response) {
   if (!response.ok) {
     let errorMessage = `HTTP error! Status: ${response.status}`;
@@ -15,10 +14,10 @@ async function handleResponse(response) {
   return response.json();
 }
 
-export async function fetchProperties(params = {}) {
+export async function fetchProperties(filters = {}) {
   const query = new URLSearchParams();
 
-  Object.entries(params).forEach(([key, value]) => {
+  Object.entries(filters).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '') {
       query.append(key, value);
     }
@@ -33,5 +32,10 @@ export async function fetchProperties(params = {}) {
 
 export async function fetchPropertyById(id) {
   const response = await fetch(`/api/properties/${id}`);
+  return handleResponse(response);
+}
+
+export async function fetchOpenHouses(id) {
+  const response = await fetch(`/api/properties/${id}/openhouses`);
   return handleResponse(response);
 }

@@ -1,7 +1,119 @@
-import React, { useState, useEffect } from 'react';
-import { fetchProperties } from '../api/client';
+import React, {useState, useEffect, useRef} from 'react';
+import {fetchProperties} from '../api/client';
 
 const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Photo+Available';
+
+//property filters
+const initialFilterState = {
+  city: '',
+  zipcode: '',
+  minPrice: '',
+  maxPrice: '',
+  beds: '',
+  baths: ''
+};
+
+function PropertyFilters({ onSearch, onClear, isLoading }) {
+  const [filters, setFilters] = useState(initialFilterState);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSearch(filters);
+  };
+
+  const handleClear = () => {
+    setFilters(initialFilterState);
+    onClear();
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="filters-form" data-testid="property-filters-form">
+      <div className="filter-group">
+        <label htmlFor="city">City</label>
+        <input
+          id="city"
+          type="text"
+          name="city"
+          placeholder="e.g. Portland"
+          value={filters.city}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="filter-group">
+        <label htmlFor="zipcode">ZIP Code</label>
+        <input
+          id="zipcode"
+          type="text"
+          name="zipcode"
+          placeholder="e.g. 97201"
+          value={filters.zipcode}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="filter-group">
+        <label htmlFor="minPrice">Min Price</label>
+        <input
+          id="minPrice"
+          type="number"
+          name="minPrice"
+          placeholder="$ Min"
+          value={filters.minPrice}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="filter-group">
+        <label htmlFor="maxPrice">Max Price</label>
+        <input
+          id="maxPrice"
+          type="number"
+          name="maxPrice"
+          placeholder="$ Max"
+          value={filters.maxPrice}
+          onChange={handleChange}
+        />
+      </div>
+
+      <div className="filter-group">
+        <label htmlFor="beds">Beds</label>
+        <select id="beds" name="beds" value={filters.beds} onChange={handleChange}>
+          <option value="">Any</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+
+      <div className="filter-group">
+        <label htmlFor="baths">Baths</label>
+        <select id="baths" name="baths" value={filters.baths} onChange={handleChange}>
+          <option value="">Any</option>
+          <option value="1">1+</option>
+          <option value="2">2+</option>
+          <option value="3">3+</option>
+        </select>
+      </div>
+
+      <div className="filter-actions">
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Searching...' : 'Search'}
+        </button>
+        <button type="button" onClick={handleClear} disabled={isLoading}>
+          Clear Filters
+        </button>
+      </div>
+    </form>
+  );
+}
+
 
 /**
  *  PropertyCard Component
@@ -25,14 +137,14 @@ function PropertyCard({ property }) {
     return FALLBACK_IMAGE;
   };
 
-  const formatPrice = (price) => {
-    if (price == null || Number.isNaN(Number(price))) return '$0';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
+const formatPrice = (price) => {
+  if (price == null || Number.isNaN(Number(price))) return '$0';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(price);
+};
 
   return (
     <div className="property-card">
@@ -69,57 +181,74 @@ function PropertyCard({ property }) {
   );
 }
 
+
+
 /**
  * ListingsPage Component
  */
 export default function ListingsPage() {
-    const [properties, setProperties] = useState([]);
-    const [total, setTotal] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [properties, setProperties] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeFilters, setActiveFilters] = useState({});
 
-    useEffect(() => {
-        let isMounted = true;
+  //week 6 debug
+  const currentRequestId = useRef(0);
 
-        async function loadListings() {
-        try {
-            setLoading(true);
-            setError(null);
-            
-            const data = await fetchProperties({ limit: 20, offset: 0 });
-            
-            if (isMounted) {
-                setProperties(data.results || []);
-                setTotal(data.total || 0);
-            }
-            } catch (err) {
-            if (isMounted) {
-                setError(err.message || 'Failed to fetch property listings.');
-            }
-            } finally {
-            if (isMounted) {
-                setLoading(false);
-            }
+  useEffect(() => {
+    const requestId = ++currentRequestId.current;
+
+    async function loadListings() {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const data = await fetchProperties(activeFilters);
+        
+        if (requestId === currentRequestId.current) {
+          setProperties(data.results || []);
+          setTotal(data.total || 0);
         }
+      } catch (err) {
+        if (requestId === currentRequestId.current) {
+          setError(err.message || 'Failed to fetch property listings.');
         }
+      } finally {
+        if (requestId === currentRequestId.current) {
+          setLoading(false);
+        }
+      }
+    }
 
-        loadListings();
+    loadListings();
+  }, [activeFilters]);
 
-        return () => {
-            isMounted = false;
-        };
-    }, []);
+  const handleSearch = (newFilters) => {
+    setActiveFilters(newFilters);
+  };
+
+  const handleClear = () => {
+    setActiveFilters({});
+  };
 
   return (
     <div className="listings-container">
       <header className="listings-header">
-        <h1>MLS Property Listings</h1>
+        <h1>Property Listings</h1>
         {!loading && !error && (
           <p className="listings-count">
             Showing {properties.length} of {total} properties
           </p>
         )}
       </header>
+
+      {/* Property Filters Component */}
+      <PropertyFilters 
+        onSearch={handleSearch} 
+        onClear={handleClear} 
+        isLoading={loading} 
+      />
 
       {loading && (
         <div className="state-message">
@@ -130,7 +259,7 @@ export default function ListingsPage() {
       {error && (
         <div className="state-message error-box">
           <p>Error: {error}</p>
-          <button onClick={() => window.location.reload()}>Retry</button>
+          <button onClick={() => setActiveFilters({...activeFilters})}>Retry</button>
         </div>
       )}
 
@@ -141,7 +270,7 @@ export default function ListingsPage() {
               <PropertyCard key={property.L_ListingID} property={property} />
             ))
           ) : (
-            <p className="no-results">No properties found.</p>
+            <p className="no-results">No properties match your filter criteria.</p>
           )}
         </div>
       )}
