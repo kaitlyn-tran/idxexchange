@@ -41,3 +41,6 @@ A Zillow-style real estate platform backed by real MLS property data.
 - Create React App
 - Property grid shows cards with real data fetched from backend
 
+### Week 6: Filter UI + Introduction to Testing
+- Working filter form
+- Introduction of Unit Test
