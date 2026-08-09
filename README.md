@@ -44,3 +44,7 @@ A Zillow-style real estate platform backed by real MLS property data.
 ### Week 6: Filter UI + Introduction to Testing
 - Working filter form
 - Introduction of Unit Test
+
+### Week 7: Pagination UI & Component Testing
+- Add pagination to listings page
+- Tests covering pagination components

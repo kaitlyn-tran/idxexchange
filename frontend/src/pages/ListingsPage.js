@@ -1,9 +1,9 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {fetchProperties} from '../api/client';
+import React, { useState, useEffect, useRef } from 'react';
+import { fetchProperties } from '../api/client';
 
 const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Photo+Available';
+const ITEMS_PER_PAGE = 20;
 
-//property filters
 const initialFilterState = {
   city: '',
   zipcode: '',
@@ -13,6 +13,183 @@ const initialFilterState = {
   baths: ''
 };
 
+
+export const getPageRange = (currentPage, totalPages, siblingCount = 1) => {
+  if (totalPages <= 1) return [];
+
+  const totalNumbers = siblingCount * 2 + 5;
+
+  if (totalPages <= totalNumbers) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
+  const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages);
+
+  const shouldShowLeftDots = leftSiblingIndex > 2;
+  const shouldShowRightDots = rightSiblingIndex < totalPages - 1;
+
+  const firstPageIndex = 1;
+  const lastPageIndex = totalPages;
+
+  if (!shouldShowLeftDots && shouldShowRightDots) {
+    const leftItemCount = 3 + 2 * siblingCount;
+    const leftRange = Array.from({ length: leftItemCount }, (_, i) => i + 1);
+    return [...leftRange, '...', totalPages];
+  }
+
+  if (shouldShowLeftDots && !shouldShowRightDots) {
+    const rightItemCount = 3 + 2 * siblingCount;
+    const rightRange = Array.from(
+      { length: rightItemCount },
+      (_, i) => totalPages - rightItemCount + i + 1
+    );
+    return [firstPageIndex, '...', ...rightRange];
+  }
+
+  if (shouldShowLeftDots && shouldShowRightDots) {
+    const middleRange = Array.from(
+      { length: rightSiblingIndex - leftSiblingIndex + 1 },
+      (_, i) => leftSiblingIndex + i
+    );
+    return [firstPageIndex, '...', ...middleRange, '...', lastPageIndex];
+  }
+
+  return [];
+};
+
+// pagination styles
+const paginationStyles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '12px',
+    margin: '30px 0',
+  },
+  summary: {
+    fontSize: '0.95rem',
+    color: '#4a5568',
+  },
+  list: {
+    display: 'flex',
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    gap: '6px',
+    alignItems: 'center',
+  },
+  btn: {
+    padding: '8px 14px',
+    border: '1px solid #cbd5e0',
+    backgroundColor: '#ffffff',
+    color: '#2d3748',
+    fontSize: '0.9rem',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease-in-out',
+  },
+  btnActive: {
+    backgroundColor: '#3182ce',
+    color: '#ffffff',
+    borderColor: '#3182ce',
+    fontWeight: 'bold',
+  },
+  btnDisabled: {
+    opacity: 0.5,
+    cursor: 'not-allowed',
+  },
+  ellipsis: {
+    padding: '0 6px',
+    color: '#718096',
+  },
+};
+
+/**
+ * Pagination Component
+ */
+function Pagination({ currentPage, totalCount, limit, onPageChange }) {
+  const totalPages = Math.ceil(totalCount / limit);
+
+  if (totalPages <= 1) return null;
+
+  const pages = getPageRange(currentPage, totalPages);
+  const startItem = (currentPage - 1) * limit + 1;
+  const endItem = Math.min(currentPage * limit, totalCount);
+
+  return (
+    <nav style={paginationStyles.container} aria-label="Pagination Navigation">
+      <div style={paginationStyles.summary}>
+        Showing <strong>{startItem}</strong>–<strong>{endItem}</strong> of{' '}
+        <strong>{totalCount}</strong> properties
+      </div>
+
+      <ul style={paginationStyles.list}>
+        {/* Previous Button */}
+        <li>
+          <button
+            style={{
+              ...paginationStyles.btn,
+              ...(currentPage === 1 ? paginationStyles.btnDisabled : {}),
+            }}
+            disabled={currentPage === 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            aria-label="Go to previous page"
+          >
+            &laquo; Prev
+          </button>
+        </li>
+
+        {/* Page Buttons & Ellipses */}
+        {pages.map((page, idx) => {
+          if (page === '...') {
+            return (
+              <li key={`ellipsis-${idx}`} style={paginationStyles.ellipsis}>
+                &#8230;
+              </li>
+            );
+          }
+
+          const isActive = page === currentPage;
+
+          return (
+            <li key={page}>
+              <button
+                style={{
+                  ...paginationStyles.btn,
+                  ...(isActive ? paginationStyles.btnActive : {}),
+                }}
+                onClick={() => onPageChange(page)}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {page}
+              </button>
+            </li>
+          );
+        })}
+
+        {/* Next Button */}
+        <li>
+          <button
+            style={{
+              ...paginationStyles.btn,
+              ...(currentPage === totalPages ? paginationStyles.btnDisabled : {}),
+            }}
+            disabled={currentPage === totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            aria-label="Go to next page"
+          >
+            Next &raquo;
+          </button>
+        </li>
+      </ul>
+    </nav>
+  );
+}
+
+/**
+ * Property Filters Component
+ */
 function PropertyFilters({ onSearch, onClear, isLoading }) {
   const [filters, setFilters] = useState(initialFilterState);
 
@@ -114,9 +291,8 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
   );
 }
 
-
 /**
- *  PropertyCard Component
+ * Property Card Component
  */
 function PropertyCard({ property }) {
   const getPrimaryPhoto = () => {
@@ -137,14 +313,14 @@ function PropertyCard({ property }) {
     return FALLBACK_IMAGE;
   };
 
-const formatPrice = (price) => {
-  if (price == null || Number.isNaN(Number(price))) return '$0';
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  }).format(price);
-};
+  const formatPrice = (price) => {
+    if (price == null || Number.isNaN(Number(price))) return '$0';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
 
   return (
     <div className="property-card">
@@ -181,10 +357,8 @@ const formatPrice = (price) => {
   );
 }
 
-
-
 /**
- * ListingsPage Component
+ * Entire ListingsPage Component
  */
 export default function ListingsPage() {
   const [properties, setProperties] = useState([]);
@@ -192,8 +366,9 @@ export default function ListingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeFilters, setActiveFilters] = useState({});
+  
+  const [currentPage, setCurrentPage] = useState(1);
 
-  //week 6 debug
   const currentRequestId = useRef(0);
 
   useEffect(() => {
@@ -204,7 +379,22 @@ export default function ListingsPage() {
         setLoading(true);
         setError(null);
         
-        const data = await fetchProperties(activeFilters);
+        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+        
+        const cleanFilters = Object.entries(activeFilters).reduce((acc, [key, val]) => {
+          if (val !== '' && val !== null && val !== undefined) {
+            acc[key] = val;
+          }
+          return acc;
+        }, {});
+
+        const queryParams = {
+          ...cleanFilters,
+          limit: ITEMS_PER_PAGE,
+          offset,
+        };
+
+        const data = await fetchProperties(queryParams);
         
         if (requestId === currentRequestId.current) {
           setProperties(data.results || []);
@@ -222,14 +412,21 @@ export default function ListingsPage() {
     }
 
     loadListings();
-  }, [activeFilters]);
+  }, [activeFilters, currentPage]);
 
   const handleSearch = (newFilters) => {
+    setCurrentPage(1); 
     setActiveFilters(newFilters);
   };
 
   const handleClear = () => {
+    setCurrentPage(1); 
     setActiveFilters({});
+  };
+
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
   };
 
   return (
@@ -259,20 +456,30 @@ export default function ListingsPage() {
       {error && (
         <div className="state-message error-box">
           <p>Error: {error}</p>
-          <button onClick={() => setActiveFilters({...activeFilters})}>Retry</button>
+          <button onClick={() => setActiveFilters({ ...activeFilters })}>Retry</button>
         </div>
       )}
 
       {!loading && !error && (
-        <div className="property-grid">
-          {properties.length > 0 ? (
-            properties.map((property) => (
-              <PropertyCard key={property.L_ListingID} property={property} />
-            ))
-          ) : (
-            <p className="no-results">No properties match your filter criteria.</p>
-          )}
-        </div>
+        <>
+          <div className="property-grid">
+            {properties.length > 0 ? (
+              properties.map((property) => (
+                <PropertyCard key={property.L_ListingID} property={property} />
+              ))
+            ) : (
+              <p className="no-results">No properties match your filter criteria.</p>
+            )}
+          </div>
+
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={currentPage}
+            totalCount={total}
+            limit={ITEMS_PER_PAGE}
+            onPageChange={handlePageChange}
+          />
+        </>
       )}
     </div>
   );
