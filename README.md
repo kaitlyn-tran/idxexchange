@@ -51,4 +51,6 @@ A Zillow-style real estate platform backed by real MLS property data.
 
 ### Week 8: Property Detail Page End-to-End
 - Created full property detail page 
-- Includes photo gallery, open hosues, and Google Maps
+- Includes photo gallery, open houses, and Google Maps
+
+### Week 9: Advanced Feature
