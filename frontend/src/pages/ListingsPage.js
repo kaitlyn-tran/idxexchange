@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { fetchProperties } from '../api/client';
+import React, {useState, useEffect, useRef} from 'react';
+import {fetchProperties} from '../api/client';
+import {Link} from 'react-router-dom';
 
 const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Photo+Available';
 const ITEMS_PER_PAGE = 20;
@@ -323,6 +324,10 @@ function PropertyCard({ property }) {
   };
 
   return (
+    <Link
+    to={`/property/${property.L_ListingID}`}
+    className="property-card-link"
+    >
     <div className="property-card">
       <div className="card-image-wrapper">
         <img 
@@ -334,6 +339,7 @@ function PropertyCard({ property }) {
           }}
         />
       </div>
+    
 
       <div className="card-content">
         <h3 className="card-price">{formatPrice(property.L_SystemPrice)}</h3>
@@ -354,6 +360,7 @@ function PropertyCard({ property }) {
         </p>
       </div>
     </div>
+    </Link>
   );
 }
 
