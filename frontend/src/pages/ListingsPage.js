@@ -1,8 +1,10 @@
-import React, {useState, useEffect, useRef} from 'react';
-import {fetchProperties} from '../api/client';
-import {Link} from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { fetchProperties } from '../api/client';
+import { Link } from 'react-router-dom';
 
-const FALLBACK_IMAGE = 'https://via.placeholder.com/400x250?text=No+Photo+Available';
+const FALLBACK_IMAGE =
+  'https://via.placeholder.com/400x250?text=No+Photo+Available';
+
 const ITEMS_PER_PAGE = 20;
 
 const initialFilterState = {
@@ -14,7 +16,6 @@ const initialFilterState = {
   baths: ''
 };
 
-
 export const getPageRange = (currentPage, totalPages, siblingCount = 1) => {
   if (totalPages <= 1) return [];
 
@@ -25,7 +26,10 @@ export const getPageRange = (currentPage, totalPages, siblingCount = 1) => {
   }
 
   const leftSiblingIndex = Math.max(currentPage - siblingCount, 1);
-  const rightSiblingIndex = Math.min(currentPage + siblingCount, totalPages);
+  const rightSiblingIndex = Math.min(
+    currentPage + siblingCount,
+    totalPages
+  );
 
   const shouldShowLeftDots = leftSiblingIndex > 2;
   const shouldShowRightDots = rightSiblingIndex < totalPages - 1;
@@ -35,16 +39,22 @@ export const getPageRange = (currentPage, totalPages, siblingCount = 1) => {
 
   if (!shouldShowLeftDots && shouldShowRightDots) {
     const leftItemCount = 3 + 2 * siblingCount;
-    const leftRange = Array.from({ length: leftItemCount }, (_, i) => i + 1);
+    const leftRange = Array.from(
+      { length: leftItemCount },
+      (_, i) => i + 1
+    );
+
     return [...leftRange, '...', totalPages];
   }
 
   if (shouldShowLeftDots && !shouldShowRightDots) {
     const rightItemCount = 3 + 2 * siblingCount;
+
     const rightRange = Array.from(
       { length: rightItemCount },
       (_, i) => totalPages - rightItemCount + i + 1
     );
+
     return [firstPageIndex, '...', ...rightRange];
   }
 
@@ -53,33 +63,43 @@ export const getPageRange = (currentPage, totalPages, siblingCount = 1) => {
       { length: rightSiblingIndex - leftSiblingIndex + 1 },
       (_, i) => leftSiblingIndex + i
     );
-    return [firstPageIndex, '...', ...middleRange, '...', lastPageIndex];
+
+    return [
+      firstPageIndex,
+      '...',
+      ...middleRange,
+      '...',
+      lastPageIndex
+    ];
   }
 
   return [];
 };
 
-// pagination styles
+/* Pagination styles */
 const paginationStyles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     gap: '12px',
-    margin: '30px 0',
+    margin: '30px 0'
   },
+
   summary: {
     fontSize: '0.95rem',
-    color: '#4a5568',
+    color: '#4a5568'
   },
+
   list: {
     display: 'flex',
     listStyle: 'none',
     padding: 0,
     margin: 0,
     gap: '6px',
-    alignItems: 'center',
+    alignItems: 'center'
   },
+
   btn: {
     padding: '8px 14px',
     border: '1px solid #cbd5e0',
@@ -88,28 +108,36 @@ const paginationStyles = {
     fontSize: '0.9rem',
     borderRadius: '4px',
     cursor: 'pointer',
-    transition: 'all 0.2s ease-in-out',
+    transition: 'all 0.2s ease-in-out'
   },
+
   btnActive: {
     backgroundColor: '#3182ce',
     color: '#ffffff',
     borderColor: '#3182ce',
-    fontWeight: 'bold',
+    fontWeight: 'bold'
   },
+
   btnDisabled: {
     opacity: 0.5,
-    cursor: 'not-allowed',
+    cursor: 'not-allowed'
   },
+
   ellipsis: {
     padding: '0 6px',
-    color: '#718096',
-  },
+    color: '#718096'
+  }
 };
 
 /**
  * Pagination Component
  */
-function Pagination({ currentPage, totalCount, limit, onPageChange }) {
+function Pagination({
+  currentPage,
+  totalCount,
+  limit,
+  onPageChange
+}) {
   const totalPages = Math.ceil(totalCount / limit);
 
   if (totalPages <= 1) return null;
@@ -119,19 +147,23 @@ function Pagination({ currentPage, totalCount, limit, onPageChange }) {
   const endItem = Math.min(currentPage * limit, totalCount);
 
   return (
-    <nav style={paginationStyles.container} aria-label="Pagination Navigation">
+    <nav
+      style={paginationStyles.container}
+      aria-label="Pagination Navigation"
+    >
       <div style={paginationStyles.summary}>
         Showing <strong>{startItem}</strong>–<strong>{endItem}</strong> of{' '}
         <strong>{totalCount}</strong> properties
       </div>
 
       <ul style={paginationStyles.list}>
-        {/* Previous Button */}
         <li>
           <button
             style={{
               ...paginationStyles.btn,
-              ...(currentPage === 1 ? paginationStyles.btnDisabled : {}),
+              ...(currentPage === 1
+                ? paginationStyles.btnDisabled
+                : {})
             }}
             disabled={currentPage === 1}
             onClick={() => onPageChange(currentPage - 1)}
@@ -141,11 +173,13 @@ function Pagination({ currentPage, totalCount, limit, onPageChange }) {
           </button>
         </li>
 
-        {/* Page Buttons & Ellipses */}
         {pages.map((page, idx) => {
           if (page === '...') {
             return (
-              <li key={`ellipsis-${idx}`} style={paginationStyles.ellipsis}>
+              <li
+                key={`ellipsis-${idx}`}
+                style={paginationStyles.ellipsis}
+              >
                 &#8230;
               </li>
             );
@@ -158,10 +192,14 @@ function Pagination({ currentPage, totalCount, limit, onPageChange }) {
               <button
                 style={{
                   ...paginationStyles.btn,
-                  ...(isActive ? paginationStyles.btnActive : {}),
+                  ...(isActive
+                    ? paginationStyles.btnActive
+                    : {})
                 }}
                 onClick={() => onPageChange(page)}
-                aria-current={isActive ? 'page' : undefined}
+                aria-current={
+                  isActive ? 'page' : undefined
+                }
               >
                 {page}
               </button>
@@ -169,12 +207,13 @@ function Pagination({ currentPage, totalCount, limit, onPageChange }) {
           );
         })}
 
-        {/* Next Button */}
         <li>
           <button
             style={{
               ...paginationStyles.btn,
-              ...(currentPage === totalPages ? paginationStyles.btnDisabled : {}),
+              ...(currentPage === totalPages
+                ? paginationStyles.btnDisabled
+                : {})
             }}
             disabled={currentPage === totalPages}
             onClick={() => onPageChange(currentPage + 1)}
@@ -191,12 +230,22 @@ function Pagination({ currentPage, totalCount, limit, onPageChange }) {
 /**
  * Property Filters Component
  */
-function PropertyFilters({ onSearch, onClear, isLoading }) {
-  const [filters, setFilters] = useState(initialFilterState);
+function PropertyFilters({
+  onSearch,
+  onClear,
+  isLoading
+}) {
+  const [filters, setFilters] = useState(
+    initialFilterState
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = (e) => {
@@ -210,9 +259,14 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="filters-form" data-testid="property-filters-form">
+    <form
+      onSubmit={handleSubmit}
+      className="filters-form"
+      data-testid="property-filters-form"
+    >
       <div className="filter-group">
         <label htmlFor="city">City</label>
+
         <input
           id="city"
           type="text"
@@ -225,6 +279,7 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
 
       <div className="filter-group">
         <label htmlFor="zipcode">ZIP Code</label>
+
         <input
           id="zipcode"
           type="text"
@@ -237,6 +292,7 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
 
       <div className="filter-group">
         <label htmlFor="minPrice">Min Price</label>
+
         <input
           id="minPrice"
           type="number"
@@ -249,6 +305,7 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
 
       <div className="filter-group">
         <label htmlFor="maxPrice">Max Price</label>
+
         <input
           id="maxPrice"
           type="number"
@@ -261,7 +318,13 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
 
       <div className="filter-group">
         <label htmlFor="beds">Beds</label>
-        <select id="beds" name="beds" value={filters.beds} onChange={handleChange}>
+
+        <select
+          id="beds"
+          name="beds"
+          value={filters.beds}
+          onChange={handleChange}
+        >
           <option value="">Any</option>
           <option value="1">1+</option>
           <option value="2">2+</option>
@@ -272,7 +335,13 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
 
       <div className="filter-group">
         <label htmlFor="baths">Baths</label>
-        <select id="baths" name="baths" value={filters.baths} onChange={handleChange}>
+
+        <select
+          id="baths"
+          name="baths"
+          value={filters.baths}
+          onChange={handleChange}
+        >
           <option value="">Any</option>
           <option value="1">1+</option>
           <option value="2">2+</option>
@@ -284,7 +353,12 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
         <button type="submit" disabled={isLoading}>
           {isLoading ? 'Searching...' : 'Search'}
         </button>
-        <button type="button" onClick={handleClear} disabled={isLoading}>
+
+        <button
+          type="button"
+          onClick={handleClear}
+          disabled={isLoading}
+        >
           Clear Filters
         </button>
       </div>
@@ -293,73 +367,185 @@ function PropertyFilters({ onSearch, onClear, isLoading }) {
 }
 
 /**
+ * Sorting Component
+ */
+function SortControls({
+  sortBy,
+  sortOrder,
+  onSortChange,
+  isLoading
+}) {
+  const handleSortChange = (e) => {
+    const value = e.target.value;
+
+    if (value === '') {
+      onSortChange('', '');
+      return;
+    }
+
+    const [field, order] = value.split('|');
+
+    onSortChange(field, order);
+  };
+
+  const currentSort =
+    sortBy && sortOrder
+      ? `${sortBy}|${sortOrder}`
+      : '';
+
+  return (
+    <div className="sort-controls">
+      <label htmlFor="sortBy">Sort by</label>
+
+      <select
+        id="sortBy"
+        value={currentSort}
+        onChange={handleSortChange}
+        disabled={isLoading}
+      >
+        <option value="">Default</option>
+
+        <option value="price|asc">
+          Price: Low to High
+        </option>
+
+        <option value="price|desc">
+          Price: High to Low
+        </option>
+
+        <option value="date|desc">
+          Date Listed: Newest
+        </option>
+
+        <option value="date|asc">
+          Date Listed: Oldest
+        </option>
+
+        <option value="sqft|desc">
+          Square Footage: Largest
+        </option>
+
+        <option value="sqft|asc">
+          Square Footage: Smallest
+        </option>
+
+        <option value="beds|desc">
+          Beds: Most
+        </option>
+
+        <option value="beds|asc">
+          Beds: Fewest
+        </option>
+      </select>
+    </div>
+  );
+}
+
+/**
  * Property Card Component
  */
 function PropertyCard({ property }) {
   const getPrimaryPhoto = () => {
-    if (!property.L_Photos) return FALLBACK_IMAGE;
+    if (!property.L_Photos) {
+      return FALLBACK_IMAGE;
+    }
 
     try {
-      const photos = typeof property.L_Photos === 'string' 
-        ? JSON.parse(property.L_Photos) 
-        : property.L_Photos;
+      const photos =
+        typeof property.L_Photos === 'string'
+          ? JSON.parse(property.L_Photos)
+          : property.L_Photos;
 
-      if (Array.isArray(photos) && photos.length > 0 && photos[0]) {
+      if (
+        Array.isArray(photos) &&
+        photos.length > 0 &&
+        photos[0]
+      ) {
         return photos[0];
       }
     } catch (err) {
-      console.warn(`Failed to parse photos for property ${property.L_ListingID}`, err);
+      console.warn(
+        `Failed to parse photos for property ${property.L_ListingID}`,
+        err
+      );
     }
 
     return FALLBACK_IMAGE;
   };
 
   const formatPrice = (price) => {
-    if (price == null || Number.isNaN(Number(price))) return '$0';
+    if (
+      price == null ||
+      Number.isNaN(Number(price))
+    ) {
+      return '$0';
+    }
+
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 0
     }).format(price);
   };
 
   return (
     <Link
-    to={`/property/${property.L_ListingID}`}
-    className="property-card-link"
+      to={`/property/${property.L_ListingID}`}
+      className="property-card-link"
     >
-    <div className="property-card">
-      <div className="card-image-wrapper">
-        <img 
-          src={getPrimaryPhoto()} 
-          alt={property.L_Address || 'Property'} 
-          onError={(e) => {
-            e.target.onerror = null; 
-            e.target.src = FALLBACK_IMAGE;
-          }}
-        />
-      </div>
-    
-
-      <div className="card-content">
-        <h3 className="card-price">{formatPrice(property.L_SystemPrice)}</h3>
-        
-        <div className="card-specs">
-            <span><strong>{property.L_Keyword2 ?? 0}</strong> beds</span> • 
-            <span><strong>{property.LM_Dec_3 ?? 0}</strong> baths</span> • 
-            <span><strong>{property.LM_Int2_3 ? property.LM_Int2_3.toLocaleString() : 0}</strong> sqft</span>
+      <div className="property-card">
+        <div className="card-image-wrapper">
+          <img
+            src={getPrimaryPhoto()}
+            alt={property.L_Address || 'Property'}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = FALLBACK_IMAGE;
+            }}
+          />
         </div>
 
-        <p className="card-address">
-            {property.L_Address || 'Address Unavailable'}<br />
-            {property.L_City || ""}
-            {property.L_City && property.L_State ? ", " : ""}
-            {property.L_State || ""}
-            {" "}
-            {property.L_Zip || ""}
-        </p>
+        <div className="card-content">
+          <h3 className="card-price">
+            {formatPrice(property.L_SystemPrice)}
+          </h3>
+
+          <div className="card-specs">
+            <span>
+              <strong>{property.L_Keyword2 ?? 0}</strong> beds
+            </span>{' '}
+            •{' '}
+            <span>
+              <strong>{property.LM_Dec_3 ?? 0}</strong> baths
+            </span>{' '}
+            •{' '}
+            <span>
+              <strong>
+                {property.LM_Int2_3
+                  ? property.LM_Int2_3.toLocaleString()
+                  : 0}
+              </strong>{' '}
+              sqft
+            </span>
+          </div>
+
+          <p className="card-address">
+            {property.L_Address ||
+              'Address Unavailable'}
+            <br />
+
+            {property.L_City || ''}
+
+            {property.L_City &&
+            property.L_State
+              ? ', '
+              : ''}
+
+            {property.L_State || ''}{' '}
+            {property.L_Zip || ''}
+          </p>
+        </div>
       </div>
-    </div>
     </Link>
   );
 }
@@ -372,86 +558,168 @@ export default function ListingsPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeFilters, setActiveFilters] = useState({});
-  
-  const [currentPage, setCurrentPage] = useState(1);
+
+  const [activeFilters, setActiveFilters] =
+    useState({});
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  /*
+   * Sorting state
+   */
+  const [sortBy, setSortBy] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
 
   const currentRequestId = useRef(0);
 
   useEffect(() => {
-    const requestId = ++currentRequestId.current;
+    const requestId =
+      ++currentRequestId.current;
 
     async function loadListings() {
       try {
         setLoading(true);
         setError(null);
-        
-        const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-        
-        const cleanFilters = Object.entries(activeFilters).reduce((acc, [key, val]) => {
-          if (val !== '' && val !== null && val !== undefined) {
-            acc[key] = val;
-          }
-          return acc;
-        }, {});
+
+        const offset =
+          (currentPage - 1) *
+          ITEMS_PER_PAGE;
+
+        const cleanFilters =
+          Object.entries(activeFilters).reduce(
+            (acc, [key, val]) => {
+              if (
+                val !== '' &&
+                val !== null &&
+                val !== undefined
+              ) {
+                acc[key] = val;
+              }
+
+              return acc;
+            },
+            {}
+          );
 
         const queryParams = {
           ...cleanFilters,
           limit: ITEMS_PER_PAGE,
-          offset,
+          offset
         };
 
-        const data = await fetchProperties(queryParams);
-        
-        if (requestId === currentRequestId.current) {
-          setProperties(data.results || []);
-          setTotal(data.total || 0);
+        if (sortBy) {
+          queryParams.sortBy = sortBy;
+          queryParams.sortOrder = sortOrder;
+        }
+
+        const data =
+          await fetchProperties(queryParams);
+
+        if (
+          requestId ===
+          currentRequestId.current
+        ) {
+          setProperties(
+            data.results || []
+          );
+
+          setTotal(
+            data.total || 0
+          );
         }
       } catch (err) {
-        if (requestId === currentRequestId.current) {
-          setError(err.message || 'Failed to fetch property listings.');
+        if (
+          requestId ===
+          currentRequestId.current
+        ) {
+          setError(
+            err.message ||
+              'Failed to fetch property listings.'
+          );
         }
       } finally {
-        if (requestId === currentRequestId.current) {
+        if (
+          requestId ===
+          currentRequestId.current
+        ) {
           setLoading(false);
         }
       }
     }
 
     loadListings();
-  }, [activeFilters, currentPage]);
+  }, [
+    activeFilters,
+    currentPage,
+    sortBy,
+    sortOrder
+  ]);
 
+  /*
+   * When new filters are applied, goes back to page 1
+   */
   const handleSearch = (newFilters) => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
+    setSortBy('');
+    setSortOrder('');
     setActiveFilters(newFilters);
   };
 
+  /*
+   * Clear filters also resets sorting.
+   */
   const handleClear = () => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
+    setSortBy('');
+    setSortOrder('');
     setActiveFilters({});
+  };
+
+  /*
+   * Sorting doesn't change the page.
+   */
+  const handleSortChange = (
+    newSortBy,
+    newSortOrder
+  ) => {
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
   };
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
     <div className="listings-container">
       <header className="listings-header">
         <h1>Property Listings</h1>
+
         {!loading && !error && (
           <p className="listings-count">
-            Showing {properties.length} of {total} properties
+            Showing {properties.length} of{' '}
+            {total} properties
           </p>
         )}
       </header>
 
-      {/* Property Filters Component */}
-      <PropertyFilters 
-        onSearch={handleSearch} 
-        onClear={handleClear} 
-        isLoading={loading} 
+      <PropertyFilters
+        onSearch={handleSearch}
+        onClear={handleClear}
+        isLoading={loading}
+      />
+
+      <SortControls
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortChange={handleSortChange}
+        isLoading={loading}
       />
 
       {loading && (
@@ -463,7 +731,16 @@ export default function ListingsPage() {
       {error && (
         <div className="state-message error-box">
           <p>Error: {error}</p>
-          <button onClick={() => setActiveFilters({ ...activeFilters })}>Retry</button>
+
+          <button
+            onClick={() =>
+              setActiveFilters({
+                ...activeFilters
+              })
+            }
+          >
+            Retry
+          </button>
         </div>
       )}
 
@@ -472,14 +749,19 @@ export default function ListingsPage() {
           <div className="property-grid">
             {properties.length > 0 ? (
               properties.map((property) => (
-                <PropertyCard key={property.L_ListingID} property={property} />
+                <PropertyCard
+                  key={property.L_ListingID}
+                  property={property}
+                />
               ))
             ) : (
-              <p className="no-results">No properties match your filter criteria.</p>
+              <p className="no-results">
+                No properties match your filter
+                criteria.
+              </p>
             )}
           </div>
 
-          {/* Pagination Controls */}
           <Pagination
             currentPage={currentPage}
             totalCount={total}
