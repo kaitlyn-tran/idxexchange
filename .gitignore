@@ -3,3 +3,4 @@ node_modules/
 backend/.env
 rets_property.sql
 rets_openhouse.sql
+coverage/

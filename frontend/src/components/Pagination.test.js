@@ -1,6 +1,7 @@
 import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Pagination, { getPageRange } from '../Pagination';
+import Pagination, { getPageRange } from './Pagination';
 
 describe('Pagination Utility Logic (getPageRange)', () => {
   test('returns full range when total pages <= 7', () => {
@@ -42,7 +43,7 @@ describe('Pagination Component UI', () => {
   });
 
   test('renders correctly on the first page', () => {
-    render(
+    const { container } = render(
       <Pagination
         currentPage={1}
         totalCount={100}
@@ -56,8 +57,15 @@ describe('Pagination Component UI', () => {
 
     expect(prevButton).toBeDisabled();
     expect(nextButton).not.toBeDisabled();
-    expect(screen.getByText('Showing')).toBeInTheDocument();
-    expect(screen.getByText('1–20')).toBeInTheDocument();
+
+    const summary = container.querySelector('.pagination-summary');
+
+    expect(summary).toBeInTheDocument();
+    expect(summary).toHaveTextContent('Showing');
+    expect(summary).toHaveTextContent('1');
+    expect(summary).toHaveTextContent('20');
+    expect(summary).toHaveTextContent('100');
+    expect(summary).toHaveTextContent('properties');
   });
 
   test('disables Next button on the last page', () => {
