@@ -2,9 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { fetchProperties } from '../api/client';
 import { Link } from 'react-router-dom';
 
-const FALLBACK_IMAGE =
-  'https://via.placeholder.com/400x250?text=No+Photo+Available';
-
 const ITEMS_PER_PAGE = 20;
 
 const initialFilterState = {
@@ -447,7 +444,7 @@ function SortControls({
 function PropertyCard({ property }) {
   const getPrimaryPhoto = () => {
     if (!property.L_Photos) {
-      return FALLBACK_IMAGE;
+      return null;
     }
 
     try {
@@ -456,21 +453,20 @@ function PropertyCard({ property }) {
           ? JSON.parse(property.L_Photos)
           : property.L_Photos;
 
-      if (
-        Array.isArray(photos) &&
-        photos.length > 0 &&
-        photos[0]
-      ) {
-        return photos[0];
+      if (Array.isArray(photos)) {
+        const validPhotos = photos.filter(
+          (photo) => typeof photo === 'string' && photo.trim()
+        );
+
+        if (validPhotos.length > 0) {
+          return validPhotos[0];
+        }
       }
-    } catch (err) {
-      console.warn(
-        `Failed to parse photos for property ${property.L_ListingID}`,
-        err
-      );
+    } catch {
+      return null;
     }
 
-    return FALLBACK_IMAGE;
+    return null;
   };
 
   const formatPrice = (price) => {
@@ -488,6 +484,8 @@ function PropertyCard({ property }) {
     }).format(price);
   };
 
+  const primaryPhoto = getPrimaryPhoto();
+
   return (
     <Link
       to={`/property/${property.L_ListingID}`}
@@ -495,14 +493,19 @@ function PropertyCard({ property }) {
     >
       <div className="property-card">
         <div className="card-image-wrapper">
-          <img
-            src={getPrimaryPhoto()}
-            alt={property.L_Address || 'Property'}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = FALLBACK_IMAGE;
-            }}
-          />
+          {primaryPhoto ? (
+            <img
+              src={primaryPhoto}
+              alt={property.L_Address || 'Property'}
+              onError={(event) => {
+                event.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="no-photo">
+              <span>No Photo Available</span>
+            </div>
+          )}
         </div>
 
         <div className="card-content">
@@ -549,6 +552,7 @@ function PropertyCard({ property }) {
     </Link>
   );
 }
+
 
 /**
  * Entire ListingsPage Component

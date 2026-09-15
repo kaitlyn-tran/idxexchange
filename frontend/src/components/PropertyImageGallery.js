@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 function parsePhotos(photoData) {
   if (!photoData) {
@@ -6,14 +6,20 @@ function parsePhotos(photoData) {
   }
 
   if (Array.isArray(photoData)) {
-    return photoData;
+    return photoData.filter((photo) => typeof photo === 'string' && photo.trim());
+  }
+
+  if (typeof photoData !== 'string') {
+    return [];
   }
 
   try {
     const photos = JSON.parse(photoData);
 
     if (Array.isArray(photos)) {
-      return photos;
+      return photos.filter(
+        (photo) => typeof photo === 'string' && photo.trim()
+      );
     }
 
     return [];
@@ -23,28 +29,35 @@ function parsePhotos(photoData) {
 }
 
 function PropertyImageGallery({ photos }) {
-  const fallbackImage =
-    'https://via.placeholder.com/1000x600?text=No+Photo+Available';
-
   const parsedPhotos = parsePhotos(photos);
-
-  const images = parsedPhotos.length
-    ? parsedPhotos
-    : [fallbackImage];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
+  useEffect(() => {
+    if (currentIndex >= parsedPhotos.length && parsedPhotos.length > 0) {
+      setCurrentIndex(0);
+    }
+  }, [parsedPhotos.length, currentIndex]);
+
   function previousPhoto() {
+    if (parsedPhotos.length === 0) {
+      return;
+    }
+
     if (currentIndex == 0) {
-      setCurrentIndex(images.length - 1);
+      setCurrentIndex(parsedPhotos.length - 1);
     } else {
       setCurrentIndex(currentIndex - 1);
     }
   }
 
   function nextPhoto() {
-    if (currentIndex == images.length - 1) {
+    if (parsedPhotos.length === 0) {
+      return;
+    }
+
+    if (currentIndex == parsedPhotos.length - 1) {
       setCurrentIndex(0);
     } else {
       setCurrentIndex(currentIndex + 1);
@@ -52,7 +65,9 @@ function PropertyImageGallery({ photos }) {
   }
 
   function openLightbox() {
-    setLightboxOpen(true);
+    if (parsedPhotos.length > 0) {
+      setLightboxOpen(true);
+    }
   }
 
   function closeLightbox() {
@@ -83,22 +98,35 @@ function PropertyImageGallery({ photos }) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [lightboxOpen, currentIndex]);
+  }, [lightboxOpen, currentIndex, parsedPhotos.length]);
+
+  if (parsedPhotos.length == 0) {
+    return (
+      <div className="property-gallery">
+        <div className="gallery-main no-photo">
+          <span>No Photo Available</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="property-gallery">
         <div className="gallery-main">
           <img
-            src={images[currentIndex]}
+            src={parsedPhotos[currentIndex]}
             alt={`Property photo ${currentIndex + 1}`}
             onClick={openLightbox}
+            onError={(event) => {
+              event.currentTarget.style.display = 'none';
+            }}
           />
         </div>
 
-        {images.length > 1 && (
+        {parsedPhotos.length > 1 && (
           <div className="gallery-thumbnails">
-            {images.map((image, index) => (
+            {parsedPhotos.map((image, index) => (
               <button
                 type="button"
                 key={index}
@@ -112,6 +140,9 @@ function PropertyImageGallery({ photos }) {
                 <img
                   src={image}
                   alt={`Thumbnail ${index + 1}`}
+                  onError={(event) => {
+                    event.currentTarget.style.display = 'none';
+                  }}
                 />
               </button>
             ))}
@@ -135,7 +166,7 @@ function PropertyImageGallery({ photos }) {
             ×
           </button>
 
-          {images.length > 1 && (
+          {parsedPhotos.length > 1 && (
             <button
               type="button"
               className="lightbox-prev"
@@ -150,13 +181,16 @@ function PropertyImageGallery({ photos }) {
           )}
 
           <img
-            src={images[currentIndex]}
+            src={parsedPhotos[currentIndex]}
             alt={`Property photo ${currentIndex + 1}`}
             className="lightbox-image"
             onClick={(event) => event.stopPropagation()}
+            onError={(event) => {
+              event.currentTarget.style.display = 'none';
+            }}
           />
 
-          {images.length > 1 && (
+          {parsedPhotos.length > 1 && (
             <button
               type="button"
               className="lightbox-next"
