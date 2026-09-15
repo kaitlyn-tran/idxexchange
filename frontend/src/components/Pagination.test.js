@@ -30,7 +30,7 @@ describe('Pagination Component UI', () => {
   });
 
   test('returns null when total pages is 1 or fewer', () => {
-    const { container } = render(
+    render(
       <Pagination
         currentPage={1}
         totalCount={15}
@@ -38,7 +38,7 @@ describe('Pagination Component UI', () => {
         onPageChange={mockOnPageChange}
       />
     );
-    expect(container.firstChild).toBeNull();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });
 
   test('renders correctly on the first page', () => {

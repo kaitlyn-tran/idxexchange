@@ -45,7 +45,7 @@ function PropertyImageGallery({ photos }) {
       return;
     }
 
-    if (currentIndex == 0) {
+    if (currentIndex === 0) {
       setCurrentIndex(parsedPhotos.length - 1);
     } else {
       setCurrentIndex(currentIndex - 1);
@@ -57,7 +57,7 @@ function PropertyImageGallery({ photos }) {
       return;
     }
 
-    if (currentIndex == parsedPhotos.length - 1) {
+    if (currentIndex === parsedPhotos.length - 1) {
       setCurrentIndex(0);
     } else {
       setCurrentIndex(currentIndex + 1);
@@ -80,16 +80,32 @@ function PropertyImageGallery({ photos }) {
         return;
       }
 
-      if (event.key == 'Escape') {
+      if (event.key === 'Escape') {
         closeLightbox();
       }
 
-      if (event.key == 'ArrowLeft') {
-        previousPhoto();
+      if (event.key === 'ArrowLeft') {
+        if (parsedPhotos.length > 0) {
+          setCurrentIndex((previousIndex) => {
+            if (previousIndex === 0) {
+              return parsedPhotos.length - 1;
+            }
+
+            return previousIndex - 1;
+          });
+        }
       }
 
-      if (event.key == 'ArrowRight') {
-        nextPhoto();
+      if (event.key === 'ArrowRight') {
+        if (parsedPhotos.length > 0) {
+          setCurrentIndex((previousIndex) => {
+            if (previousIndex === parsedPhotos.length - 1) {
+              return 0;
+            }
+
+            return previousIndex + 1;
+          });
+        }
       }
     }
 
@@ -98,9 +114,9 @@ function PropertyImageGallery({ photos }) {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [lightboxOpen, currentIndex, parsedPhotos.length]);
+  }, [lightboxOpen, parsedPhotos.length]);
 
-  if (parsedPhotos.length == 0) {
+  if (parsedPhotos.length === 0) {
     return (
       <div className="property-gallery">
         <div className="gallery-main no-photo">
@@ -131,7 +147,7 @@ function PropertyImageGallery({ photos }) {
                 type="button"
                 key={index}
                 className={
-                  index == currentIndex
+                  index === currentIndex
                     ? 'thumbnail active'
                     : 'thumbnail'
                 }

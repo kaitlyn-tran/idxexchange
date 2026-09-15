@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchProperties } from '../api/client';
-import { Link } from 'react-router-dom';
 import PropertyCard from '../components/PropertyCard';
 import {PropertyFilters} from '../components/PropertyFilters';
 import Pagination from '../components/Pagination';
