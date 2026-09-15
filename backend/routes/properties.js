@@ -82,16 +82,21 @@ router.get('/', async (req, res) => {
       });
     }
 
-    // Default sorting
-    if (sortBy == undefined) {
-      sortBy = 'price';
-    }
+    // Build sorting clause only when sorting is requested
+    let orderByClause = '';
 
-    if (sortOrder == undefined) {
-      sortOrder = 'asc';
-    }
+    if (sortBy != undefined) {
+      const sortColumn = SORT_FIELDS[sortBy];
 
-    const sortColumn = SORT_FIELDS[sortBy];
+      if (sortOrder == undefined) {
+        sortOrder = 'asc';
+      }
+
+      orderByClause = `
+        ORDER BY ${sortColumn} ${sortOrder.toUpperCase()},
+                L_ListingID ASC
+      `;
+    }
 
     // Build filter conditions
     const conditions = [];
@@ -200,8 +205,7 @@ router.get('/', async (req, res) => {
       SELECT *
       FROM rets_property
       ${whereClause}
-      ORDER BY ${sortColumn} ${sortOrder.toUpperCase()},
-               L_ListingID ASC
+      ${orderByClause}
       LIMIT ? OFFSET ?
     `;
 
@@ -214,11 +218,11 @@ router.get('/', async (req, res) => {
       total,
       limit,
       offset,
-      sortBy,
-      sortOrder,
+      sortBy: sortBy || null,
+      sortOrder: sortOrder || null,
       results
     });
-
+    
   } catch (error) {
     console.error('Database query error:', error);
 
