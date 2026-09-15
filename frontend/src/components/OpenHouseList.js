@@ -36,7 +36,7 @@ function formatTime(time) {
 
   hours = hours % 12;
 
-  if (hours == 0) {
+  if (hours === 0) {
     hours = 12;
   }
 
@@ -48,7 +48,7 @@ function getRemarks(allData) {
     return '';
   }
 
-  if (typeof allData == 'object') {
+  if (typeof allData === 'object') {
     return allData.OpenHouseRemarks || '';
   }
 
@@ -62,7 +62,7 @@ function getRemarks(allData) {
 }
 
 function OpenHouseList({ openHouses }) {
-  if (!openHouses || openHouses.length == 0) {
+  if (!openHouses || openHouses.length === 0) {
     return (
       <section className="open-houses">
         <h2>Open Houses</h2>
