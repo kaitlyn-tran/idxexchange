@@ -54,3 +54,5 @@ A Zillow-style real estate platform backed by real MLS property data.
 - Includes photo gallery, open houses, and Google Maps
 
 ### Week 9: Advanced Feature
+- Sorting advanced feature added
+- Added React Error Boundary
