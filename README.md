@@ -1,7 +1,7 @@
 # IDX Exchange Property Search Platform
 
 ## Project Description
-A full-stack, RedFin/Zillow-style property search application backed by real MLS property data. Built with React, Node.js, Express, and MySQL. Features include property searching, filtering, sorting, photo galleris, and open house information. 
+A full-stack, RedFin/Zillow-style property search application backed by real MLS property data. Built with React, Node.js, Express, and MySQL. Features include property searching, filtering, sorting, photo galleries, and open house information. 
 
 ![Property Search Application](IDXScreenshot.png)
 
@@ -63,7 +63,7 @@ cd backend
 npm install
 ```
 
-Create an `.env` file inside the backend directory
+Create an `.env` file inside the backend directory.
 ```powershell
 PORT=5000
 DB_HOST=localhost
@@ -173,7 +173,7 @@ Example Response:
   "L_SystemPrice": 664900
 }
 ```
-If property is not found, endpoint returns HTTP 404
+If property is not found, endpoint returns HTTP 404.
 
 ### GET /api/properties/:id/openhouses
 
@@ -194,7 +194,7 @@ Example Response:
   }
 ]
 ```
-If no open house is scheduled, endpoint returns `[]`
+If no open house is scheduled, endpoint returns `[]`.
 Malformed or oversized IDs return 400.
 Unknown properties return 404.
 
