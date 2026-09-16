@@ -443,3 +443,143 @@ body {
 .gallery-main.no-photo {
   min-height: 400px;
 }
+
+/* =========================
+   FILTER / SEARCH CONTROLS
+   ========================= */
+
+.filters-form {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(31, 55, 86, 0.08);
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  color: #526783;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.filter-group input,
+.filter-group select {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+
+  border: 1px solid #d9e1ec;
+  border-radius: 22px;
+
+  background: #ffffff;
+  color: #243b5a;
+
+  font-size: 14px;
+
+  outline: none;
+}
+
+.filter-group input::placeholder {
+  color: #8a99ad;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: #3f7edb;
+  box-shadow: 0 0 0 3px rgba(63, 126, 219, 0.12);
+}
+
+
+/* =========================
+   FILTER BUTTONS
+   ========================= */
+
+.filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.filter-actions button {
+  height: 44px;
+  padding: 0 20px;
+
+  border: none;
+  border-radius: 22px;
+
+  background: #3f7edb;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.filter-actions button:hover {
+  background: #326fc7;
+}
+
+.filter-actions button:last-child {
+  background: #edf3fa;
+  color: #526783;
+}
+
+.filter-actions button:last-child:hover {
+  background: #e2ebf5;
+}
+
+
+/*sort control*/
+.sort-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.sort-controls label {
+  color: #526783;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sort-controls select {
+  height: 42px;
+  min-width: 190px;
+  padding: 0 20px 0 16px;
+
+  border: 1px solid #d9e1ec;
+  border-radius: 21px;
+
+  background: #ffffff;
+  color: #243b5a;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  outline: none;
+
+}
+
+.sort-controls select:hover {
+  border-color: #b8c7da;
+}
+
+.sort-controls select:focus {
+  border-color: #3f7edb;
+  box-shadow: 0 0 0 3px rgba(63, 126, 219, 0.12);
+}
+
